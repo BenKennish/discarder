@@ -2,15 +2,15 @@ document.addEventListener('DOMContentLoaded', function ()
 {
 
   const discardButton = document.getElementById('discardButton');
-  let numTabsToDiscard = 0;
-  let numTabsDiscarded = 0;
-  let numTabsFailedToDiscard = 0;
 
   function discardTabs(force) {
 
+    let numTabsToDiscard = 0;
+    let numTabsDiscarded = 0;
+    let numTabsFailedToDiscard = 0;
+
     return new Promise((resolve) =>
     {
-
       chrome.windows.getAll({populate: true}).then((windows) =>
       {
 
@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', function ()
               chrome.tabs.discard(tab.id).then( (t) => {
 
                 if (t) { // we discarded the tab successfully
-                  console.warn(`Tab ${tab.id} discarded`);
+                  console.log(`Tab ${tab.id} discarded`);
                   numTabsDiscarded++;
                 }
                 else {
-                  console.error(`Error discarding tab ${tab.id}:`, chrome.runtime.lastError);
+                  console.warn(`Error discarding tab ${tab.id}:`, chrome.runtime.lastError);
                   numTabsFailedToDiscard++;
                 }
 
