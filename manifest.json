@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Discarder",
-  "description": "Allows on-demand discarding of all tabs except those that have auto discard disabled",
-  "version": "0.1",
+  "description": "Allows on-demand discarding of all tabs, optionally respecting auto discardable",
+  "version": "0.2",
   "icons": 
   {
     //"16": "icon16.png",

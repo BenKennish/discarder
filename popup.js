@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function ()
 
   function discardTabs(force) {
 
-    let numTabsToDiscard = 0;
     let numTabsDiscarded = 0;
     let numTabsFailedToDiscard = 0;
 
@@ -20,27 +19,26 @@ document.addEventListener('DOMContentLoaded', function ()
         {
           if (!tab.discarded && (force || (tab.autoDiscardable && !tab.active)))
           {
-            // tab.active means that a tab is active within its window
-            // seems to be true for tabs that are selected in a window that is partially visible
-
-            numTabsToDiscard++;
-
-            console.log('tab.memoryInfo', tab.memoryInfo);
-
             // without shift-click we only discard
-            // auto-discardable tabs that aren't the active tab
+            // auto-discardable tabs that aren't active
+            //
+            // active means that a tab is active within its window if window is partially visible
+
+            // these don't work for some reason:
+            //console.log('tab.memoryInfo', tab.memoryInfo);
+            //console.log('tab.memoryInfo.memoryUsage', tab.memoryInfo.memoryUsage);
 
             discardTasks.push(
 
               chrome.tabs.discard(tab.id).then( (discardedTab) => {
 
-                if (discardedTab) { // we discarded the tab successfully
-                  //console.log(`Tab ${discardedTab.id} discarded`);
+                if (discardedTab) {
+                  // we discarded the tab successfully
+                  console.log(`Tab ${discardedTab.id} discarded`);
                   numTabsDiscarded++;
-                
-                  console.log('discardedTab.memoryInfo', discardedTab.memoryInfo);
 
-                  //TODO: calculate RAM usage
+                  //TODO: calculate RAM usage here?
+
                   return true;
                 }
                 else {
@@ -50,15 +48,12 @@ document.addEventListener('DOMContentLoaded', function ()
                 }
 
               })
-
             );
-
           }
         }
+      }; //chrome.windows.getAll()
 
-      }; //chrome.windows.getAll
-
-      Promise.all(discardTasks).then( (results) => {
+      Promise.all(discardTasks).then((results) => {
 
         console.log('results', results);
 
@@ -71,17 +66,16 @@ document.addEventListener('DOMContentLoaded', function ()
            priority: 0,
            silent: true
         });
+
       });
 
     });
 
   }
 
-
   discardButton.addEventListener('click', (event) =>
   {
     discardTabs(event.shiftKey);
   });
-
 
 });
