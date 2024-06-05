@@ -1,12 +1,24 @@
+// utility function to convert potentially large number of bytes into a more
+// human readable form
+function bytesToSize(bytes) 
+{
+  //TODO: show only 1 or 2 decimal places
+  const units = ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte"];
+  const unitIndex = Math.max(0, Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1));
+  return Intl.NumberFormat("en", { style: "unit", unit: units[unitIndex] }).format(bytes / (1024 ** unitIndex));
+}
+
+
 document.addEventListener('DOMContentLoaded', function () 
 {
 
   const discardButton = document.getElementById('discardButton');
 
-  function discardTabs(force) {
+  // this is a shit way of doing it as it's affected by other system processes etc
+  let memAvailableBefore = 0;
+  let memAvailableAfter = 0;
 
-    let numTabsDiscarded = 0;
-    let numTabsFailedToDiscard = 0;
+  function discardTabs(force) {
 
     const discardTasks = [];
 
@@ -24,26 +36,28 @@ document.addEventListener('DOMContentLoaded', function ()
             //
             // active means that a tab is active within its window if window is partially visible
 
-            // these don't work for some reason:
-            //console.log('tab.memoryInfo', tab.memoryInfo);
-            //console.log('tab.memoryInfo.memoryUsage', tab.memoryInfo.memoryUsage);
+            // chrome.processes API is not available for non nightly builds so none of this works
+            //let pid = chrome.processes.getProcessIdForTab(tab.id);
+            //console.log(pid);
+            //chrome.processes.getProcessInfo(pid, true);
 
             discardTasks.push(
 
               chrome.tabs.discard(tab.id).then( (discardedTab) => {
 
-                if (discardedTab) {
+                if (discardedTab)
+                {
                   // we discarded the tab successfully
                   console.log(`Tab ${discardedTab.id} discarded`);
-                  numTabsDiscarded++;
+                  console.log(discardedTab);
 
                   //TODO: calculate RAM usage here?
 
                   return true;
                 }
-                else {
+                else
+                {
                   console.warn(`Error discarding tab ${tab.id}:`, chrome.runtime.lastError);
-                  numTabsFailedToDiscard++;
                   return false;
                 }
 
@@ -57,14 +71,26 @@ document.addEventListener('DOMContentLoaded', function ()
 
         console.log('results', results);
 
-        chrome.notifications.create(
-        {
-           type: "basic",
-           iconUrl: "icon128.png",
-           title: "Tabs Discarded",
-           message: `${numTabsDiscarded} tabs were discarded, ${numTabsFailedToDiscard} failed to discard`,
-           priority: 0,
-           silent: true
+        chrome.system.memory.getInfo().then( (info) => {
+          memAvailableAfter = info.availableCapacity;
+
+          let numDiscarded = results.filter((result) => result).length;  //count elements that evaluate to true
+          let numErrored = results.length - numDiscarded;
+
+          console.log('memAvailableBefore',memAvailableBefore);
+          console.log('memAvailableAfter',memAvailableAfter);
+
+          chrome.notifications.create(
+          {
+             type: "basic",
+             iconUrl: "icon128.png",
+             title: `${numDiscarded} Tabs Discarded`,
+             message: (numDiscarded > 0 ? `\n${bytesToSize(memAvailableAfter - memAvailableBefore)} memory freed`: '')
+                      + (numErrored > 0 ? `\n${numErrored} tabs failed to discard` : ''),
+             priority: 0,
+             silent: true
+          });
+
         });
 
       });
@@ -75,7 +101,10 @@ document.addEventListener('DOMContentLoaded', function ()
 
   discardButton.addEventListener('click', (event) =>
   {
-    discardTabs(event.shiftKey);
+    chrome.system.memory.getInfo().then( (info) => {
+      memAvailableBefore = info.availableCapacity;
+      discardTabs(event.shiftKey);
+    });
   });
 
 });

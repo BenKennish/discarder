@@ -21,7 +21,8 @@
   "permissions": 
   [
     "tabs",
-    "notifications"
+    "notifications",
+    "system.memory"
   ]
   /* "background": 
   {
