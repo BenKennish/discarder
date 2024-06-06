@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Discarder",
   "description": "Allows on-demand discarding of all tabs, optionally respecting auto discardable",
-  "version": "0.2",
+  "version": "0.3",
   "icons": 
   {
     //"16": "icon16.png",
