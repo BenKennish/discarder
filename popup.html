@@ -4,8 +4,9 @@
   <title>Discarder</title>
   <style>
     body {
-      width: 200px;
+      width: 300px;
       font-family: Arial, sans-serif;
+      font-size: 16px;
     }
     button {
       width: 100%;
@@ -13,10 +14,18 @@
       font-size: 16px;
       margin-top: 10px;
     }
+
   </style>
 </head>
 <body>
-  <p>Click to discard tabs<br/>(shift-click to force):</p>
+  <h1><img src="icon128.png" style="width: 30px;" /> Discarder</h1>
+
+  <h2>Auto-discardable tabs: <span id="numLoadedTabs"></span></h2>
+
+  <p>Using ????MB<span id=""></span></p>
+
+  <p>Click to discard tabs (shift-click to force):</p>
+
   <button id="discardButton">Discard</button>
   <script src="popup.js"></script>
 </body>

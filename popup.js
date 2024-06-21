@@ -11,10 +11,21 @@ function bytesToSize(bytes)
 }
 
 
+function updateStats()
+{
+  const numLoadedTabs = document.getElementById('numLoadedTabs');
+
+  chrome.tabs.query({discarded: false, status: 'complete', autoDiscardable: true}).then((tabs) => {
+    numLoadedTabs.innerHTML = tabs.length;
+  });
+}
+
+
 document.addEventListener('DOMContentLoaded', function () 
 {
-
   const discardButton = document.getElementById('discardButton');
+
+  updateStats();
 
   // this is a shit way of doing it as it's affected by other system processes etc
   // but it's the best i've figured out for now
@@ -26,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function ()
 
     const discardTasks = [];
 
+    // TODO: use chrome.tabs.query instead?
     chrome.windows.getAll({populate: true}).then((windows) =>
     {
       for (let window of windows)
@@ -69,6 +81,14 @@ document.addEventListener('DOMContentLoaded', function ()
       Promise.all(discardTasks).then((results) => {
 
         console.log('results', results);
+
+        // now update the numbers in the popup
+        //document.dispatchEvent(new Event("DOMContentLoaded", {
+        //  bubbles: true,
+        // cancelable: true
+        //}));
+
+        updateStats();
 
         chrome.system.memory.getInfo().then( (info) => {
           memAvailableAfter = info.availableCapacity;
