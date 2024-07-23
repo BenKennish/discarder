@@ -15,6 +15,8 @@ function updateStats()
 {
   const numLoadedTabs = document.getElementById('numLoadedTabs');
 
+  // update UI to show the number of tabs that are not discarded and are set to auto discardable
+  // status: complete is (i think) the same as a fully "loaded" tab
   chrome.tabs.query({discarded: false, status: 'complete', autoDiscardable: true}).then((tabs) => {
     numLoadedTabs.innerHTML = tabs.length;
   });
@@ -52,6 +54,8 @@ document.addEventListener('DOMContentLoaded', function ()
             // it seems that discarding active tabs is kinda pointless because they are just automatically
             // reloaded anyway
 
+            //TODO: refuse to discard the extensions pop-up 'tab' so that when we are holding shift, it doesn't disappear
+
             // chrome.processes API is not available for non nightly builds so none of this works
             //let pid = chrome.processes.getProcessIdForTab(tab.id);
             //console.log(pid);
@@ -73,7 +77,9 @@ document.addEventListener('DOMContentLoaded', function ()
                   return false;
                 }
               })
+
             );
+
           }
         }
       };
@@ -94,10 +100,11 @@ document.addEventListener('DOMContentLoaded', function ()
           memAvailableAfter = info.availableCapacity;
 
           let numDiscarded = results.filter((result) => result).length;  //count elements that evaluate to true
+          //FIXME: numDiscarded is too large (e.g. 75) and is larger than the numLoadedTabs displayed
           let numErrored = results.length - numDiscarded;
 
-          console.log('memAvailableBefore',memAvailableBefore);
-          console.log('memAvailableAfter',memAvailableAfter);
+          console.log('memAvailableBefore', memAvailableBefore);
+          console.log('memAvailableAfter', memAvailableAfter);
 
           chrome.notifications.create(
           {
