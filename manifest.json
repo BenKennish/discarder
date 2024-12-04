@@ -2,30 +2,22 @@
   "manifest_version": 3,
   "name": "Discarder",
   "description": "Allows on-demand discarding of all tabs, optionally respecting auto discardable",
-  "version": "0.3",
-  "icons": 
-  {
-    //"16": "icon16.png",
-    //"48": "icon48.png",
+  "version": "0.4",
+  "icons": {
     "128": "icon128.png"
   },
-  "action": 
-  {
+  "action": {
     "default_popup": "popup.html",
-    "default_icon": 
-    {
-      //"48": "/assets/icons/48.png",
+    "default_icon": {
       "128": "icon128.png"
     }
   },
-  "permissions": 
-  [
+  "permissions": [
     "tabs",
     "notifications",
     "system.memory"
-  ]
-  /* "background": 
-  {
-    "service_worker": "background.js"
-  } */
+  ],
+  "background": {
+    "notes": "ignored property.  want to use background.js?  set 'service_worker': 'background.js'"
+  }
 }
